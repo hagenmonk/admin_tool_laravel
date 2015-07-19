@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Player data</title>
+        <title>Insert Data</title>
 
         <link href="//fonts.googleapis.com/css?family=Lato:100" rel="stylesheet" type="text/css">
 
@@ -25,17 +25,16 @@
         </style>
     </head>
     <body>
-        <div class="title">Player Data</div>
+        <div class="title">Insert Data</div>
         <hr>
 	    
 	    <?php 
-	       echo Form::open(array('url' => 'admin/playerdata'));
-	       echo "Player id:".Form::text('player_id'); 
-	       echo Form::submit('submit');
+	       echo Form::open(array('url' => 'admin/'));
 	    ?>
-	    
+	    匯入log檔到<input type="date" name="log_date">之前
+	    <?php echo Form::submit('匯入'); ?>
 	    <table class = "table table-striped">
-	    <?php echo $results; ?>
+	    <?php //echo $results; ?>
 		</table>
 		</div>
         </div>

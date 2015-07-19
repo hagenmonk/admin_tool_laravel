@@ -14,7 +14,8 @@
  * 			Admin::menu()->url('my-page')->label('My custom page')->uses('\MyController@getMyPage');
  * 		});
  */
-Admin::menu()->url('/')->label('Start page')->icon('fa-book')->uses('\SleepingOwl\Admin\Controllers\DummyController@getIndex');
-Admin::menu()->url('playerdata')->label('Player Data')->icon('fa-dashboard')->uses('App\Http\Controllers\PlayerController@index'); 
+//Admin::menu()->url('/')->label('Start page')->icon('fa-book')->uses('\SleepingOwl\Admin\Controllers\DummyController@getIndex');
+Admin::menu()->url('/')->label('Insert Data')->icon('')->uses('App\Http\Controllers\PlayerController@insert_data_index'); 
+Admin::menu()->url('playerdata')->label('Player Data')->icon('')->uses('App\Http\Controllers\PlayerController@index'); 
 
 

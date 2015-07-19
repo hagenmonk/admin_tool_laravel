@@ -63,6 +63,18 @@ return [
             'prefix'    => '',
             'strict'    => false,
         ],
+	
+	'mysql2' => [
+            'driver'    => 'mysql',
+	    'host'      => env('DB_HOST', 'localhost'),
+            'database'  => env('DB_DATABASE', 'HR_log'),
+            'username'  => env('DB_USERNAME', 'root'),
+            'password'  => env('DB_PASSWORD', 'sillyfish'),
+            'charset'   => 'utf8',
+            'collation' => 'utf8_general_ci',
+            'prefix'    => '',
+            'strict'    => false,
+        ],
 
         'pgsql' => [
             'driver'   => 'pgsql',
