@@ -29,7 +29,23 @@ class PlayerController extends Controller {
 		
 		return view('player.index' , ['results'=>$html_table]);
 	}
+
+	public function login_index()
+	{
+		$results = DB::connection('mysql2')->table('login_log')->get();
+		$html_table = self::setHtmlTable($results);
+		
+		return view('player.login' , ['results'=>$html_table]);
+	}
 	
+	public function logout_index()
+	{
+		$results = DB::connection('mysql2')->table('login_log')->get();
+		$html_table = self::setHtmlTable($results);
+		
+		return view('player.logout' , ['results'=>$html_table]);
+	}
+
 	public function insert_data_index()
 	{
 	    $results = "";
@@ -46,7 +62,8 @@ class PlayerController extends Controller {
 	    	foreach($file_dates as $id => $date)
 	    	{
 	    		//if id >1 then it won't be '.' ot '..'
-	    	    
+	    	    if($id>1)
+	    	    {
 		    		//get all filess
 					$files = scandir($log_path.'/'.$date);
 					foreach($files as $file)
@@ -63,7 +80,7 @@ class PlayerController extends Controller {
 							}
 			    		}
 					}
-		    	
+		    	}
 	    	}
 	    }
 	    else
