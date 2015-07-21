@@ -34,69 +34,71 @@ class PlayerController extends Controller {
 	{
 	    $results = "";
 	    $log_date = Input::get('log_date');
-	    
+	    $log_path =  "/home/log";
+	    $cur_date = date("Ymd",strtotime($log_date));
 	    
 	    //convert all log to db
 	    if($log_date=='')
 	    {
-	    	$log_path =  "/home/log";
-	    	$file_years = scandir($log_path);
-		$sql = "";
-		
-	    	foreach($file_years as $id => $year)
+	    	$file_dates = scandir($log_path);
+			
+			//get all dates folder
+	    	foreach($file_dates as $id => $date)
 	    	{
-	    	    if($id>1)
-		    {
-		    	$months = scandir($log_path.'/'.$year);
-		    	foreach($months as $m_id => $month)
-	    		{
-			    if($m_id>1)
-			    {
-			    	$files = scandir($log_path.'/'.$year.'/'.$month);
-			    	foreach($files as $file)
-				{
-		    	    		$logfile = fopen($log_path.'/'.$year.'/'.$month.'/'.$file, "r") or die("Unable to open file!");
-					
-	    		    	$tablename = explode('.',$file);
-				while(!feof($logfile)) 
-			    	{
-		  			$column_string = json_decode(fgets($logfile));
-					if(!empty($column_string))
-					{	
-					    DB::connection('mysql2')->table($tablename[0])->insert((array)$column_string[0]);
+	    		//if id >1 then it won't be '.' ot '..'
+	    	    
+		    		//get all filess
+					$files = scandir($log_path.'/'.$date);
+					foreach($files as $file)
+					{
+			    	    $logfile = fopen($log_path.'/'.$date.'/'.$file, "r") or die("Unable to open file!");
+						
+		    		    $tablename = explode('.',$file);
+						while(!feof($logfile)) 
+						{
+						  	$column_string = json_decode(fgets($logfile));
+							if(!empty($column_string))
+							{	
+								DB::connection('mysql2')->table($tablename[0])->insert((array)$column_string[0]);
+							}
+			    		}
 					}
-	    		    	}
-				}
-			    }
-			}
-		    }
+		    	
 	    	}
 	    }
 	    else
 	    {
-	    	$root =  "/home/log";
-	    	$file_years = scandir($root);
-	    
-	    	foreach($file_years as $year)
+	    	$file_dates = scandir($log_path);
+			
+			//get all dates folder
+	    	foreach($file_dates as $id => $date)
 	    	{
-	    	    if(strpos($year,'.')==false)
-		    {
-		    	
-		    }
+
+	    		if($date == $cur_date)
+	    			break;
+
+	    		//if id >1 then it won't be '.' or '..'
+	    	    if($id>1)
+		    	{
+		    		//get all filess
+					$files = scandir($log_path.'/'.$date);
+					foreach($files as $file)
+					{
+			    	    $logfile = fopen($log_path.'/'.$date.'/'.$file, "r") or die("Unable to open file!");
+						
+		    		    $tablename = explode('.',$file);
+						while(!feof($logfile)) 
+						{
+						  	$column_string = json_decode(fgets($logfile));
+							if(!empty($column_string))
+							{	
+								DB::connection('mysql2')->table($tablename[0])->insert((array)$column_string[0]);
+							}
+			    		}
+					}
+		    	}
 	    	}
 	    }
-	    
-	    if(DB::table('player')->first()=='')
-	    {
-	    	
-	    }
-	    
-	  /*    
-	    $logfile = fopen("login_log_20150706.log", "r") or die("Unable to open file!");
-	    while(!feof($logfile)) {
-		  $results .= fgets($logfile) ;
-	    }
-	    */
 	    
 	    return view('insertdata' , ['results'=>$file_years]);
 	}
