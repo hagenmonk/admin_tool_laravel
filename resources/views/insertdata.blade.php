@@ -29,14 +29,18 @@
         <hr>
 	    
 	    <?php 
-	       echo Form::open(array('url' => 'admin/'));
+	       echo Form::open(array('url' => 'admin/', 'isSend'));
+	       echo trans('messages.text_insert_log_to');
 	    ?>
-	    匯入log檔到<input type="date" name="log_date">之前
-	    <?php echo Form::submit('匯入'); ?>
+	    <input type="date" name="log_date">
+	    <?php echo Form::submit(trans('messages.submit')); ?>
 	    <table class = "table table-striped">
-	    <?php //echo $results; ?>
-		</table>
-		</div>
+	    <tr><td>
+	    <?php
+	    	echo $results;
+	    ?>
+	    </td></tr>
+	    	</table>
         </div>
     </body>
 </html>

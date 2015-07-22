@@ -17,5 +17,6 @@
 //Admin::menu()->url('/')->label('Start page')->icon('fa-book')->uses('\SleepingOwl\Admin\Controllers\DummyController@getIndex');
 Admin::menu()->url('/')->label('Insert Data')->icon('')->uses('App\Http\Controllers\PlayerController@insert_data_index'); 
 Admin::menu()->url('playerdata')->label('Player Data')->icon('')->uses('App\Http\Controllers\PlayerController@index'); 
-
+Admin::menu()->url('login_data')->label('Login Data')->icon('')->uses('App\Http\Controllers\PlayerController@login_index'); 
+Admin::menu()->url('logout_data')->label('Logout Data')->icon('')->uses('App\Http\Controllers\PlayerController@logout_index'); 
 

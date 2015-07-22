@@ -25,42 +25,74 @@ class PlayerController extends Controller {
 	    else
 	    	$results = DB::table('player')->get();
 		
-	    $html_table = self::setHtmlTable($results);
+	    $html_table = self::set_htmltable($results);
 		
 		return view('player.index' , ['results'=>$html_table]);
 	}
 
 	public function login_index()
 	{
-		$results = DB::connection('mysql2')->table('login_log')->get();
-		$html_table = self::setHtmlTable($results);
+		$results = DB::connection('mysql_log')->table('login_log')->get();
+		$html_table = self::set_htmltable($results);
 		
 		return view('player.login' , ['results'=>$html_table]);
 	}
 	
 	public function logout_index()
 	{
-		$results = DB::connection('mysql2')->table('login_log')->get();
-		$html_table = self::setHtmlTable($results);
+		$results = DB::connection('mysql_log')->table('logout_log')->get();
+		$html_table = self::set_htmltable($results);
 		
 		return view('player.logout' , ['results'=>$html_table]);
 	}
 
 	public function insert_data_index()
 	{
-	    $results = "";
 	    $log_date = Input::get('log_date');
 	    $log_path =  "/home/log";
-	    $cur_date = date("Ymd",strtotime($log_date));
+	    $result = 0;
 	    
-	    //convert all log to db
-	    if($log_date=='')
+	    //if post form then insert data
+	    if(Input::get('_token'))
 	    {
-	    	$file_dates = scandir($log_path);
+	    	//convert all log to db
+	    	$result = self::insert_log_data($log_path,$log_date);
+	    }
+	    
+	    return view('insertdata' , ['results'=> self::convert_result_word($result) ]);
+	}
+	
+	private function convert_result_word($result)
+	{	
+		switch($result){
+			case 0:
+				return '';
+			break;
+			case 1:
+				return trans('messages.fail');
+			break;
+			case 2:
+				return trans('messages.success');
+			break;
+		}
+		
+		return $result;
+	}
+	
+	private function insert_log_data($log_path ,$log_date)
+	{
+		$result = 1;
+		$cur_date = date("Ymd",strtotime($log_date));
+		$file_dates = scandir($log_path);
+		$insert_data = array();
 			
 			//get all dates folder
 	    	foreach($file_dates as $id => $date)
 	    	{
+			//if have log_date just insert until this folder
+			if($date == $cur_date)
+	    			break;
+		
 	    		//if id >1 then it won't be '.' ot '..'
 	    	    if($id>1)
 	    	    {
@@ -71,56 +103,38 @@ class PlayerController extends Controller {
 			    	    $logfile = fopen($log_path.'/'.$date.'/'.$file, "r") or die("Unable to open file!");
 						
 		    		    $tablename = explode('.',$file);
+				    
+				    
 						while(!feof($logfile)) 
 						{
+							//delete
+					
 						  	$column_string = json_decode(fgets($logfile));
 							if(!empty($column_string))
-							{	
-								DB::connection('mysql2')->table($tablename[0])->insert((array)$column_string[0]);
+							{
+							
+								if($log_date!='')
+								{
+									DB::connection('mysql_log')->delete("delete from $tablename[0] where date >='$cur_date'");
+								}
+								else
+								{
+									DB::connection('mysql_log')->delete("delete from $tablename[0] "); 
+								}
+								array_push($insert_data,(array)$column_string[0]);	
+								$result = 2;
 							}
-			    		}
-					}
-		    	}
-	    	}
-	    }
-	    else
-	    {
-	    	$file_dates = scandir($log_path);
-			
-			//get all dates folder
-	    	foreach($file_dates as $id => $date)
-	    	{
-
-	    		if($date == $cur_date)
-	    			break;
-
-	    		//if id >1 then it won't be '.' or '..'
-	    	    if($id>1)
-		    	{
-		    		//get all filess
-					$files = scandir($log_path.'/'.$date);
-					foreach($files as $file)
-					{
-			    	    $logfile = fopen($log_path.'/'.$date.'/'.$file, "r") or die("Unable to open file!");
+			    			}
 						
-		    		    $tablename = explode('.',$file);
-						while(!feof($logfile)) 
-						{
-						  	$column_string = json_decode(fgets($logfile));
-							if(!empty($column_string))
-							{	
-								DB::connection('mysql2')->table($tablename[0])->insert((array)$column_string[0]);
-							}
-			    		}
+						DB::connection('mysql_log')->table($tablename[0])->insert($insert_data);
 					}
 		    	}
 	    	}
-	    }
-	    
-	    return view('insertdata' , ['results'=>$file_years]);
+		
+		return $result;
 	}
 	
-	private function setHtmlTable($datas)
+	private function set_htmltable($datas)
 	{
 	    $htmlTable = "";
 	    

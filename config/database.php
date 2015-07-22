@@ -64,7 +64,7 @@ return [
             'strict'    => false,
         ],
 	
-	'mysql2' => [
+	'mysql_log' => [
             'driver'    => 'mysql',
 	    'host'      => env('DB_HOST', 'localhost'),
             'database'  => env('DB_DATABASE', 'HR_log'),

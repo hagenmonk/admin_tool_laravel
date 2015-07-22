@@ -31,7 +31,7 @@
 	    <?php 
 	       echo Form::open(array('url' => 'admin/playerdata'));
 	       echo "Player id:".Form::text('player_id'); 
-	       echo Form::submit('submit');
+	       echo Form::submit(trans('messages.submit'));
 	    ?>
 	    
 	    <table class = "table table-striped">
