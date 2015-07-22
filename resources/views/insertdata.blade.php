@@ -32,8 +32,12 @@
 	       echo Form::open(array('url' => 'admin/', 'isSend'));
 	       echo trans('messages.text_insert_log_to');
 	    ?>
-	    <input type="date" name="log_date">
-	    <?php echo Form::submit(trans('messages.submit')); ?>
+	    <input type="date" name="log_date" style="height:30px">
+	    <?php 
+	    	echo trans('messages.text_insert_command');
+		echo Form::text('log_command');
+		echo Form::submit(trans('messages.submit')); 
+	    ?>
 	    <table class = "table table-striped">
 	    <tr><td>
 	    <?php

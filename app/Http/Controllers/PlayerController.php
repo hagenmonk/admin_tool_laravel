@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Input;
 use View;
 use Storage;
 use DB;
+use Schema;
 use Illuminate\Routing\Route;
 
 class PlayerController extends Controller {
@@ -49,6 +50,7 @@ class PlayerController extends Controller {
 	public function insert_data_index()
 	{
 	    $log_date = Input::get('log_date');
+	    $log_command = Input::get('log_command');
 	    $log_path =  "/home/log";
 	    $result = 0;
 	    
@@ -56,7 +58,7 @@ class PlayerController extends Controller {
 	    if(Input::get('_token'))
 	    {
 	    	//convert all log to db
-	    	$result = self::insert_log_data($log_path,$log_date);
+	    	$result = self::insert_log_data($log_path,$log_date,$log_command);
 	    }
 	    
 	    return view('insertdata' , ['results'=> self::convert_result_word($result) ]);
@@ -69,22 +71,28 @@ class PlayerController extends Controller {
 				return '';
 			break;
 			case 1:
-				return trans('messages.fail');
+				return trans('messages.false');
 			break;
 			case 2:
 				return trans('messages.success');
+			break;
+			case 3:
+				return trans('messages.error_not_found_command');
 			break;
 		}
 		
 		return $result;
 	}
 	
-	private function insert_log_data($log_path ,$log_date)
+	private function insert_log_data($log_path ,$log_date, $log_command)
 	{
-		$result = 1;
 		$cur_date = date("Ymd",strtotime($log_date));
 		$file_dates = scandir($log_path);
-		$insert_data = array();
+		
+		if($log_command!='')
+			$result = 3;
+		else
+			$result = 1;
 			
 			//get all dates folder
 	    	foreach($file_dates as $id => $date)
@@ -100,9 +108,9 @@ class PlayerController extends Controller {
 					$files = scandir($log_path.'/'.$date);
 					foreach($files as $file)
 					{
-			    	    $logfile = fopen($log_path.'/'.$date.'/'.$file, "r") or die("Unable to open file!");
-						
-		    		    $tablename = explode('.',$file);
+			    	    		$logfile = fopen($log_path.'/'.$date.'/'.$file, "r") or die("Unable to open file!");
+				 		$insert_data = array();	
+		    		    		$tablename = explode('.',$file);
 				    
 				    
 						while(!feof($logfile)) 
@@ -110,9 +118,36 @@ class PlayerController extends Controller {
 							//delete
 					
 						  	$column_string = json_decode(fgets($logfile));
-							if(!empty($column_string))
-							{
+							$column_string = (array)$column_string[0];
 							
+							if(!empty($column_string) && ($log_command=='' || $log_command == $column_string['command']))
+							{
+								array_push($insert_data,$column_string);
+							}
+			    			}
+						
+						if(!empty($insert_data))
+						{
+							if (!Schema::connection('mysql_log')->hasTable($tablename[0]))
+							{
+								Schema::connection('mysql_log')->create($tablename[0], function($table) use($insert_data)
+								{
+								    $table->increments('id');
+								    foreach($insert_data[0] as $column_name => $column_value)
+								    {
+								    
+								    	if($column_name == 'date')
+								        	$table->dateTime('date');
+									else if(is_int($column_value))
+										$table->int($column_name);
+									else
+										$table->string($column_name);
+								    }
+								});
+							}
+							else
+							{
+								
 								if($log_date!='')
 								{
 									DB::connection('mysql_log')->delete("delete from $tablename[0] where date >='$cur_date'");
@@ -121,12 +156,11 @@ class PlayerController extends Controller {
 								{
 									DB::connection('mysql_log')->delete("delete from $tablename[0] "); 
 								}
-								array_push($insert_data,(array)$column_string[0]);	
-								$result = 2;
 							}
-			    			}
-						
-						DB::connection('mysql_log')->table($tablename[0])->insert($insert_data);
+							
+							DB::connection('mysql_log')->table($tablename[0])->insert($insert_data);
+							$result = 2;
+						}
 					}
 		    	}
 	    	}
