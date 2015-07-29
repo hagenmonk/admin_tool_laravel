@@ -22,9 +22,9 @@ class PlayerController extends Controller {
 	    $player_id = Input::get('player_id');
 	    
 	    if($player_id!='')
-	        $results = DB::table('player')->where('player_id',$player_id)->get();
+	        $results = DB::connection('mysql_player')->table('player')->where('player_id',$player_id)->get();
 	    else
-	    	$results = DB::table('player')->get();
+	    	$results = DB::connection('mysql_player')->table('player')->get();
 		
 	    $html_table = self::set_htmltable($results);
 		
@@ -86,6 +86,7 @@ class PlayerController extends Controller {
 	
 	private function insert_log_data($log_path ,$log_date, $log_command)
 	{
+	
 		$cur_date = date("Ymd",strtotime($log_date));
 		$file_dates = scandir($log_path);
 		

@@ -55,19 +55,19 @@ return [
         'mysql' => [
             'driver'    => 'mysql',
 	    'host'      => env('DB_HOST', 'localhost'),
-            'database'  => env('DB_DATABASE', 'HR_player'),
+            'database'  => env('DB_DATABASE', 'HR_log'),
             'username'  => env('DB_USERNAME', 'root'),
             'password'  => env('DB_PASSWORD', 'sillyfish'),
             'charset'   => 'utf8',
-            'collation' => 'utf8_unicode_ci',
+            'collation' => 'utf8_general_ci',
             'prefix'    => '',
             'strict'    => false,
         ],
 	
-	'mysql_log' => [
+	'mysql_player' => [
             'driver'    => 'mysql',
 	    'host'      => env('DB_HOST', 'localhost'),
-            'database'  => env('DB_DATABASE', 'HR_log'),
+            'database'  => env('DB_DATABASE', 'HR_player'),
             'username'  => env('DB_USERNAME', 'root'),
             'password'  => env('DB_PASSWORD', 'sillyfish'),
             'charset'   => 'utf8',

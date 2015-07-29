@@ -29,7 +29,7 @@
         <hr>
 	    
 	    <?php 
-	       echo Form::open(array('url' => 'admin/playerdata'));
+	       echo Form::open(array('url' => 'admin/logout_data'));
 	       echo "Player id:".Form::text('player_id'); 
 	       echo Form::submit(trans('messages.submit'));
 	    ?>
