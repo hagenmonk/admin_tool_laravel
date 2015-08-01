@@ -54,7 +54,7 @@ return [
 
         'mysql' => [
             'driver'    => 'mysql',
-	    'host'      => env('DB_HOST', 'localhost'),
+	        'host'      => env('DB_HOST', 'localhost'),
             'database'  => env('DB_DATABASE', 'HR_log'),
             'username'  => env('DB_USERNAME', 'root'),
             'password'  => env('DB_PASSWORD', 'sillyfish'),

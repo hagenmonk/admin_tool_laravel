@@ -33,7 +33,7 @@ class PlayerController extends Controller {
 
 	public function login_index()
 	{
-		$results = DB::connection('mysql_log')->table('login_log')->get();
+		$results = DB::table('login_log')->get();
 		$html_table = self::set_htmltable($results);
 		
 		return view('player.login' , ['results'=>$html_table]);
@@ -41,7 +41,7 @@ class PlayerController extends Controller {
 	
 	public function logout_index()
 	{
-		$results = DB::connection('mysql_log')->table('logout_log')->get();
+		$results = DB::table('logout_log')->get();
 		$html_table = self::set_htmltable($results);
 		
 		return view('player.logout' , ['results'=>$html_table]);
@@ -98,8 +98,8 @@ class PlayerController extends Controller {
 			//get all dates folder
 	    	foreach($file_dates as $id => $date)
 	    	{
-			//if have log_date just insert until this folder
-			if($date == $cur_date)
+				//if have log_date just insert until this folder
+				if($date == $cur_date)
 	    			break;
 		
 	    		//if id >1 then it won't be '.' ot '..'
@@ -109,10 +109,9 @@ class PlayerController extends Controller {
 					$files = scandir($log_path.'/'.$date);
 					foreach($files as $file)
 					{
-			    	    		$logfile = fopen($log_path.'/'.$date.'/'.$file, "r") or die("Unable to open file!");
+			    	    $logfile = fopen($log_path.'/'.$date.'/'.$file, "r") or die("Unable to open file!");
 				 		$insert_data = array();	
-		    		    		$tablename = explode('.',$file);
-				    
+		    		    $tablename = explode('.',$file);
 				    
 						while(!feof($logfile)) 
 						{
@@ -125,41 +124,28 @@ class PlayerController extends Controller {
 							{
 								array_push($insert_data,$column_string);
 							}
-			    			}
+			    		}
 						
 						if(!empty($insert_data))
 						{
-							if (!Schema::connection('mysql_log')->hasTable($tablename[0]))
+							if (!Schema::hasTable($tablename[0]))
 							{
-								Schema::connection('mysql_log')->create($tablename[0], function($table) use($insert_data)
-								{
-								    $table->increments('id');
-								    foreach($insert_data[0] as $column_name => $column_value)
-								    {
-								    
-								    	if($column_name == 'date')
-								        	$table->dateTime('date');
-									else if(is_int($column_value))
-										$table->int($column_name);
-									else
-										$table->string($column_name);
-								    }
-								});
+								self::create_table($insert_data);
 							}
 							else
 							{
 								
 								if($log_date!='')
 								{
-									DB::connection('mysql_log')->delete("delete from $tablename[0] where date >='$cur_date'");
+									DB::delete("delete from $tablename[0] where date >='$cur_date'");
 								}
 								else
 								{
-									DB::connection('mysql_log')->delete("delete from $tablename[0] "); 
+									DB::delete("delete from $tablename[0] "); 
 								}
 							}
 							
-							DB::connection('mysql_log')->table($tablename[0])->insert($insert_data);
+							DB::table($tablename[0])->insert($insert_data);
 							$result = 2;
 						}
 					}
@@ -167,6 +153,23 @@ class PlayerController extends Controller {
 	    	}
 		
 		return $result;
+	}
+
+	private function create_table($table_columns)
+	{
+		Schema::create($tablename[0], function($table) use($table_columns)
+		{
+			$table->increments('id');
+			foreach($table_columns[0] as $column_name => $column_value)
+			{
+				if($column_name == 'date')
+					$table->dateTime('date');
+				else if(is_int($column_value))
+					$table->int($column_name);
+				else
+					$table->string($column_name);
+			}
+		});
 	}
 	
 	private function set_htmltable($datas)
